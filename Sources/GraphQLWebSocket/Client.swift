@@ -74,7 +74,7 @@ public class GraphQLWebSocket: WebSocketDelegate {
         case connecting
         
         /// WebSocket has opened.
-        case opened(socket: WebSocket)
+        case opened(socket: WebSocketClient)
         
         /// Open WebSocket connection has been acknowledged
         case acknowledged(payload: [String: AnyCodable]?)
@@ -143,7 +143,7 @@ public class GraphQLWebSocket: WebSocketDelegate {
 
     // MARK: - Internals
     
-    public func didReceive(event: WebSocketEvent, client: WebSocket) {
+    public func didReceive(event: WebSocketEvent, client: WebSocketClient) {
         self.config.logger.debug("Received a new message from the server!")
         
         switch event {
@@ -211,14 +211,13 @@ public class GraphQLWebSocket: WebSocketDelegate {
             self.config.logger.debug("Server suggested reconnect...")
             break
         
-        case .cancelled:
+        case .cancelled, .peerClosed:
             self.close(code: 1000)
             break
             
         case .disconnected(_, let closeCode):
             self.close(code: closeCode)
             break
-            
         }
     }
     
